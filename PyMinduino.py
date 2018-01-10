@@ -1,95 +1,106 @@
 import socket,json,time
 import serial.tools.list_ports
 import atexit
+import sys
 
-
-######socket creation
-
-#print data
-#print formatt
-
-#r = neuroSocket.send(data)
-#print r
+neuroSocket = None
+ser = None
 
 def connectToNeurosky():
+    global neuroSocket
     neuroSocket = socket.create_connection(("127.0.0.1",13854))
     data = '{"appName":"appName","appKey":"appKey"}'
     formatt = '{"enableRawOutput":true,"format":"Json"}'
     r = neuroSocket.sendall(formatt)
     print r
 
-    return neuroSocket
-
-def main():
-    try:
-        #connectToNeurosky()
-
-        print "Waiting for MindWave"
-        neuroSocket = connectToNeurosky()
-        if(neuroSocket != None):
-            print "Connected to Neurosky MindWave"
-
-        #connectToArduino()
-        print "Connecting to Arduino"
-        ports = list(serial.tools.list_ports.comports())
-        for p in ports:
-            print p
-            if("Silicon" or "Arduino" in p[1]):
-                print "Arduino Located at ",p[0]
-                ser = serial.Serial(p[0], 9600)
-                hile ser.read() != '1':
+def connectToArduino():
+    global ser
+    ports = list(serial.tools.list_ports.comports())
+    for p in ports:
+        print p
+        if("Silicon" or "Arduino" in p[1]):
+            print "Arduino Located at ",p[0]
+            ser = serial.Serial(p[0], 9600)
+            while ser.read() != '1':
                 ser.read()
                 print "arduino setup"
 
-                ######30 sec delay
-                print "wait for 30 sec ....."
-                start=time.time()
-                diff=0
-                while diff<30:
-                    rep = neuroSocket.recv(1024)
-                    diff=time.time()-start
-                    
-        #receiveData()
-        #######actual execution    
-        fwd="1" 
-        timeDiff=0
-        start=time.time()
+            ######30 sec delay
+            print "wait for 30 sec ....."
+            start=time.time()
+            diff=0
+            while diff<30:
+                rep = neuroSocket.recv(1024)
+                diff=time.time()-start
+def receiveData():
+    fwd="1" 
+    timeDiff=0
+    start=time.time()
 
-        while True:
-            blinkc=0
-            rep = neuroSocket.recv(1024)
-            if("blink" in rep):
-                print "blink"
-                blinkc=blinkc+1
-                #print rep
-                rep = rep.split('\r')
-                for data in rep:
-                    print data
-                    
-            if("eSense" in rep):
-                rep = rep.split('\r')
-                for data in rep:
-                    print data
-            timeDiff=time.time()- start
-            if timeDiff>3:
-                print blinkc
-                if blinkc==2:
-                    fwd="2"
-                    print("forward")
-                else:
-                    fwd="1"
-                    print"stop"
-                #ser.write(fwd.encode())
-                timeDiff=0
-                start=time.time()
-                blinkc=0
-
+    while True:
+        blinkc=0
+        rep = neuroSocket.recv(1024)
+        if("blink" in rep):
+            print "blink"
+            blinkc=blinkc+1
             #print rep
+            rep = rep.split('\r')
+            for data in rep:
+                print data
+                
+        if("eSense" in rep):
+            rep = rep.split('\r')
+            for data in rep:
+                print data
+        timeDiff=time.time()- start
+        if timeDiff>3:
+            print blinkc
+            if blinkc==2:
+                fwd="2"
+                print("forward")
+            else:
+                fwd="1"
+                print"stop"
+            #ser.write(fwd.encode())
+            timeDiff=0
+            start=time.time()
+            blinkc=0
+
+def main():
+    try:
+        global neuroSocket, ser
+        
+        #connect to neurosky mindwave
+        print "Waiting for MindWave"
+        connectToNeurosky()
+        if(neuroSocket != None):
+            print "Connected to Neurosky MindWave"
+            #connect to arduino
+            print "Connecting to Arduino"
+            connectToArduino()
+            #receive data
+            if(ser != None):
+                print "Connected to Arduino"
+                receiveData()
+            else:
+                print "Arduino not available"
+        else:
+            print "Error connecting to MindWave"
 
     except KeyboardInterrupt:
-        ser.close()
-        neuroSocket.close()
+        if(ser != None):
+            ser.close()
+        if(neuroSocket != None):
+            neuroSocket.close()
         print "System Shutdown"
+    except Exception:
+        tb = sys.exc_info()
+        #print "Exception"
+        #print tb
+        if("actively refused" in str(tb[1])):
+            print "ThinkGear is not running you dumb fuck!"
+        
     finally:
         print "Clean up"
 
