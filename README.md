@@ -1,3 +1,3 @@
 # ProjectBCI
 
-Implementation of Brain Computer Interface Wheelchair in aid of physically disabled people.
+Implementation of Brain Computer Interface in aid of physically disabled people.
