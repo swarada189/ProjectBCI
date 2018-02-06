@@ -194,7 +194,7 @@ class WheelchairControl(QtGui.QMainWindow, gui.Ui_MainWindow):
         while(ser.read() != '1' and not stopEvent.is_set()):
             rep = neuroSocket.recv(1024)
             
-        print "Done"
+        #print "Done"
         
     def receiveData(self, stopEvent):
         global isMoving, counter
