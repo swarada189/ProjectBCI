@@ -6,7 +6,7 @@ from PyQt4.QtCore import QTimer,QTime
 import sys
 import gui
 import threading
-#import bluetooth
+import bluetooth
 
 
 neuroSocket = None
@@ -63,7 +63,7 @@ class WheelchairControl(QtGui.QMainWindow, gui.Ui_MainWindow):
                 if direction==0:
                         self.imageLabel.setText("RIGHT")
                         #ser.write("4")
-                       # sock.send("4")
+                        sock.send("4")
                         print "right selected"
                         #for image display
                         #self.imageLabel.setStyleSheet("image: url(:/Directions/images/right.jpg)")
@@ -72,21 +72,21 @@ class WheelchairControl(QtGui.QMainWindow, gui.Ui_MainWindow):
                     self.imageLabel.setText("LEFT")
                     print "left selected"
                     #ser.write("3")
-                    #sock.send("3")
+                    sock.send("3")
                     #isMoving = False
                 
                 else:
                     self.imageLabel.setText("FORWARD")
                     print "forward selected"
                     #ser.write("2")
-                    #sock.send("2")
+                    sock.send("2")
                     #isMoving = False
                 
             else:
                     self.currentCommand("Stopped")
                     self.statusLabel.setText("Double blink to select direction")
                     #ser.write("1")
-                    #sock.send("1")
+                    sock.send("1")
                     if flag==0:
                         self.imageLabel.setText("RIGHT")
                         direction = 0
@@ -129,7 +129,7 @@ class WheelchairControl(QtGui.QMainWindow, gui.Ui_MainWindow):
 
         #print "Searching for devices..."
         #print ""
-        """
+        
         nearby_devices = bluetooth.discover_devices(duration=1,flush_cache=True)
         num = 0
         
@@ -145,7 +145,7 @@ class WheelchairControl(QtGui.QMainWindow, gui.Ui_MainWindow):
         sock = bluetooth.BluetoothSocket( bluetooth.RFCOMM )
         port = 1
         a = sock.connect((bd_addr, port))
-        """
+        
     def setupDevice(self):
 
         global isArduinoSetup
