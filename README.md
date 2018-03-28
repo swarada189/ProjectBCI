@@ -4,4 +4,4 @@ Implementation of Brain Computer Interface in aid of physically disabled people.
 
 Dependencies:
 
-PyQT 4
+PyQt 4
