@@ -1,6 +1,8 @@
 # ProjectBCI
 
-Implementation of Brain Computer Interface in aid of physically disabled people.
+Brain-Controlled Wheelchair 
+
+Implementation of BCI (Brain Computer Interface) in aid of physically disabled people.
 
 Dependencies:
 
